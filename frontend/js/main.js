@@ -67,6 +67,8 @@ form.addEventListener('submit', async (e) => {
       body: JSON.stringify({ sessionId: SESSION_ID, message: text }),
     });
 
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let sseBuf = '';
@@ -111,6 +113,7 @@ form.addEventListener('submit', async (e) => {
       bubble.textContent = 'Hmm, Boreng nggak sempat jawab. Coba lagi ya 💙';
     }
   } catch (err) {
+    console.error('[Boreng]', err);
     bubble.textContent = 'Yah, koneksinya putus. Coba lagi ya 💙';
   } finally {
     setStreaming(false);
