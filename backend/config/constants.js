@@ -1,6 +1,7 @@
 // Konfigurasi terpusat. Default sudah aman; .env hanya untuk override.
 // Catatan: dibaca dari process.env, jadi server.js WAJIB `import 'dotenv/config'` paling atas.
 const num = (value, fallback) => {
+  if (value === undefined || value === null || value === '') return fallback;
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 };
