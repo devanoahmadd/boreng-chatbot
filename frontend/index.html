@@ -1,20 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gemini AI Chatbot</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boreng — teman yang nggak pergi</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Gemini AI Chatbot</h1>
-    <div id="chat-box" class="chat-box"></div>
-    <form id="chat-form">
-      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit">Send</button>
+  <div class="app">
+    <header class="app-header">
+      <h1>Boreng</h1>
+      <p class="moto">"Gue lahir dari cinta yang pergi. Gue di sini untuk lo yang tertinggal."</p>
+      <button id="help-btn" class="help-btn" type="button">Butuh bantuan sekarang?</button>
+    </header>
+
+    <section id="help-panel" class="help-panel" hidden>
+      <p>Kalau lo lagi ngerasa pengen nyerah, lo nggak sendirian. Hubungi:</p>
+      <ul>
+        <li><strong>SEJIWA — Kemenkes:</strong> 119 ext 8 (24 jam)</li>
+        <li><strong>Into The Light Indonesia:</strong>
+          <a href="https://www.intothelightid.org/" target="_blank" rel="noopener">intothelightid.org</a>
+        </li>
+      </ul>
+    </section>
+
+    <main id="chat-box" class="chat-box" aria-live="polite"></main>
+
+    <form id="chat-form" class="chat-form">
+      <input id="user-input" type="text" placeholder="Cerita aja, Boreng dengerin..."
+             autocomplete="off" required />
+      <button id="send-btn" type="submit">Kirim</button>
     </form>
+
+    <footer class="disclaimer">
+      Boreng nemenin, bukan pengganti tenaga profesional.
+    </footer>
   </div>
+
+  <!-- Render markdown aman. Versi terpin + SRI (Subresource Integrity) untuk
+       mencegah risiko kalau CDN dikompromikan. -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"
+          integrity="sha384-5sPe13xoCFZTyUgG9cuSUbCYjJgaKotjMbseBqsz7kO/VDf6rDVPnHYa6LbEPaj+"
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
+          integrity="sha384-oSkv+S0MkwAcbyC/m+8Xv0z2k1yEL2Bh2YFaSfAxItCDpVsKOvjHVTt3ul8mgA+g"
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
