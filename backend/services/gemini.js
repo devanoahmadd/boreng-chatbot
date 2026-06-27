@@ -25,7 +25,7 @@ function isTransient(err) {
 // Stream balasan Boreng. onChunk dipanggil tiap potongan teks.
 // Mengembalikan history terbaru untuk disimpan ke session.
 export async function streamReply({ history, message, onChunk }) {
-  let lastErr;
+  let lastErr = new Error('streamReply: tidak ada attempt yang berjalan (cek GEMINI_MAX_RETRY)');
 
   for (let attempt = 0; attempt <= GEMINI_MAX_RETRY; attempt++) {
     let emitted = false;
@@ -36,19 +36,22 @@ export async function streamReply({ history, message, onChunk }) {
         history,
       });
 
-      const stream = await withTimeout(
-        chat.sendMessageStream({ message }),
+      // Timeout membungkus SELURUH proses streaming (ambil stream + iterasi),
+      // supaya hang di tengah stream tetap ter-timeout, bukan hanya saat inisiasi.
+      await withTimeout(
+        (async () => {
+          const stream = await chat.sendMessageStream({ message });
+          for await (const chunk of stream) {
+            const piece = chunk.text;
+            if (piece) {
+              emitted = true;
+              onChunk(piece);
+            }
+          }
+        })(),
         GEMINI_TIMEOUT_MS,
-        'sendMessageStream',
+        'stream-gemini',
       );
-
-      for await (const chunk of stream) {
-        const piece = chunk.text;
-        if (piece) {
-          emitted = true;
-          onChunk(piece);
-        }
-      }
 
       return chat.getHistory();
     } catch (err) {
