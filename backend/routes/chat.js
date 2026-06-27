@@ -1,6 +1,6 @@
 // Endpoint chat: rate limit + validasi input + SSE streaming + jaminan kontak darurat.
 import express from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { getHistory, saveHistory } from '../utils/session.js';
 import { streamReply } from '../services/gemini.js';
 import { checkCrisis, CRISIS_CONTACT_TEXT } from '../config/safety.js';
@@ -28,7 +28,7 @@ const chatLimiter = rateLimit({
   max: RATE_LIMIT_PER_MIN,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.body?.sessionId || req.ip,
+  keyGenerator: (req) => req.body?.sessionId || ipKeyGenerator(req.ip),
   handler: (req, res) => {
     res.writeHead(200, sseHeaders());
     sseSend(res, { error: 'Pelan-pelan ya, kita ngobrol bareng kok. Coba lagi sebentar lagi 💙' });
