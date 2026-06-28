@@ -133,5 +133,30 @@ form.addEventListener('submit', (e) => {
   sendMessage(input.value);
 });
 
-// Sementara (Task 3 akan ganti): link "langsung cerita" buka chat kosong.
+// Peta mood → pesan-user pembuka (mood jadi konteks pertama buat Boreng).
+const MOOD_MESSAGE = {
+  Sedih:   'Aku lagi sedih banget.',
+  Hampa:   'Aku ngerasa hampa, kayak kosong gitu.',
+  Capek:   'Aku capek banget, lahir batin.',
+  Cemas:   'Aku lagi cemas dan kepikiran terus.',
+  Marah:   'Aku lagi marah dan kesel sama keadaan.',
+  Bingung: 'Aku bingung, nggak tahu harus gimana.',
+};
+
+// Pilih mood → buka chat + kirim pesan pembuka sesuai mood.
+document.getElementById('mood-list').addEventListener('click', (e) => {
+  const chip = e.target.closest('.mood-chip');
+  if (!chip) return;
+  showChat();
+  sendMessage(MOOD_MESSAGE[chip.dataset.mood] || chip.dataset.mood);
+});
+
+// Link "langsung cerita aja" → buka chat kosong (starter chips terlihat).
 document.getElementById('welcome-skip').addEventListener('click', showChat);
+
+// Starter chip → kirim teksnya sebagai pesan.
+starters.addEventListener('click', (e) => {
+  const chip = e.target.closest('.starter-chip');
+  if (!chip) return;
+  sendMessage(chip.textContent);
+});

@@ -141,3 +141,30 @@ body{
 @media (prefers-reduced-motion: reduce){
   .typing span{ animation:none; }
 }
+
+/* ===== Welcome detail ===== */
+.welcome-title{ margin:14px 0 2px; font-size:1.7rem; font-weight:700; letter-spacing:.3px; }
+.welcome-moto{ margin:0 0 18px; color:var(--muted); font-style:italic; font-size:.92rem; }
+.welcome-prompt{ margin:0 0 12px; color:var(--text-soft); font-size:1rem; }
+
+.mood-list{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.mood-chip,.starter-chip{
+  background:var(--surface); border:1px solid var(--border-soft); color:var(--text-soft);
+  border-radius:999px; padding:8px 14px; font-size:.85rem; cursor:pointer; transition:all .15s ease;
+}
+.mood-chip:hover,.starter-chip:hover{ border-color:var(--accent); color:var(--text); }
+
+.welcome-skip{
+  margin-top:18px; background:none; border:none; color:var(--muted);
+  font-size:.85rem; cursor:pointer; text-decoration:underline; text-underline-offset:3px;
+}
+.welcome-skip:hover{ color:var(--text-soft); }
+
+/* ===== Starter chips (di atas input) ===== */
+.starters{ display:flex; flex-wrap:wrap; gap:7px; padding:0 2px 4px; }
+.starters[hidden]{ display:none; }
+.starter-chip{ font-size:.78rem; padding:6px 11px; }
+
+@media (prefers-reduced-motion: reduce){
+  .mood-chip,.starter-chip{ transition:none; }
+}
