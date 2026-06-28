@@ -17,8 +17,10 @@ function sseHeaders() {
   };
 }
 
-// Kirim satu event SSE.
+// Kirim satu event SSE. Guard: jangan menulis setelah response ditutup
+// (mis. chunk telat dari stream yang sudah timeout) agar server tidak crash.
 function sseSend(res, obj) {
+  if (res.writableEnded) return;
   res.write(`data: ${JSON.stringify(obj)}\n\n`);
 }
 
@@ -55,6 +57,10 @@ router.post('/chat', chatLimiter, async (req, res) => {
 
   res.writeHead(200, sseHeaders());
 
+  // Hitung sinyal krisis di awal: jaminan kontak darurat HARUS independen
+  // dari sukses/gagalnya Gemini (Bagian 4/5/13 CLAUDE.md).
+  const isCrisis = checkCrisis(message);
+
   try {
     const history = getHistory(sessionId);
 
@@ -65,17 +71,15 @@ router.post('/chat', chatLimiter, async (req, res) => {
     });
 
     saveHistory(sessionId, updatedHistory);
-
-    // Jaring pengaman: kontak darurat dijamin muncul, independen dari output model.
-    if (checkCrisis(message)) {
-      sseSend(res, { text: CRISIS_CONTACT_TEXT });
-    }
-
-    sseSend(res, { done: true });
   } catch (err) {
     console.error('Gagal stream Gemini:', err);
     sseSend(res, { error: 'Maaf, Boreng lagi susah mikir bentar. Coba kirim lagi ya 💙' });
   } finally {
+    // Jaring pengaman: kontak darurat DIJAMIN muncul walau Gemini gagal.
+    if (isCrisis) {
+      sseSend(res, { text: CRISIS_CONTACT_TEXT });
+    }
+    sseSend(res, { done: true });
     res.end();
   }
 });
