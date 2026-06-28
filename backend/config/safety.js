@@ -25,6 +25,16 @@ export function checkCrisis(message) {
   return CRISIS_KEYWORDS.some((kw) => text.includes(kw));
 }
 
+// Penanda bahwa sebuah teks SUDAH memuat rujukan kontak darurat.
+// Dipakai untuk dedup: kalau balasan model sudah menyebut kontak,
+// blok jaminan tak perlu diulang (hindari tampil dobel).
+const CONTACT_MARKERS = ['119', 'sejiwa', 'into the light', 'intothelight'];
+export function mentionsCrisisContact(text) {
+  if (!text || typeof text !== 'string') return false;
+  const t = text.toLowerCase();
+  return CONTACT_MARKERS.some((m) => t.includes(m));
+}
+
 // Blok teks (markdown) yang dijamin dikirim ke user saat krisis terdeteksi.
 // Nada tenang, tidak menghakimi, tidak menutup percakapan.
 export const CRISIS_CONTACT_TEXT = [

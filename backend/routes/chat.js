@@ -3,7 +3,7 @@ import express from 'express';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { getHistory, saveHistory } from '../utils/session.js';
 import { streamReply } from '../services/gemini.js';
-import { checkCrisis, CRISIS_CONTACT_TEXT } from '../config/safety.js';
+import { checkCrisis, mentionsCrisisContact, CRISIS_CONTACT_TEXT } from '../config/safety.js';
 import { RATE_LIMIT_PER_MIN, MAX_INPUT_CHARS } from '../config/constants.js';
 
 const router = express.Router();
@@ -60,6 +60,8 @@ router.post('/chat', chatLimiter, async (req, res) => {
   // Hitung sinyal krisis di awal: jaminan kontak darurat HARUS independen
   // dari sukses/gagalnya Gemini (Bagian 4/5/13 CLAUDE.md).
   const isCrisis = checkCrisis(message);
+  // Akumulasi balasan model untuk dedup kontak darurat.
+  let replyText = '';
 
   try {
     const history = getHistory(sessionId);
@@ -67,7 +69,10 @@ router.post('/chat', chatLimiter, async (req, res) => {
     const updatedHistory = await streamReply({
       history,
       message,
-      onChunk: (piece) => sseSend(res, { text: piece }),
+      onChunk: (piece) => {
+        replyText += piece;
+        sseSend(res, { text: piece });
+      },
     });
 
     saveHistory(sessionId, updatedHistory);
@@ -76,7 +81,10 @@ router.post('/chat', chatLimiter, async (req, res) => {
     sseSend(res, { error: 'Maaf, Boreng lagi susah mikir bentar. Coba kirim lagi ya 💙' });
   } finally {
     // Jaring pengaman: kontak darurat DIJAMIN muncul walau Gemini gagal.
-    if (isCrisis) {
+    // Dedup: lewati kalau balasan model sudah memuat rujukan kontak darurat
+    // (mis. model sudah menyebut SEJIWA/Into The Light). Saat Gemini gagal,
+    // replyText kosong → blok tetap terkirim (jaminan tetap utuh).
+    if (isCrisis && !mentionsCrisisContact(replyText)) {
       sseSend(res, { text: CRISIS_CONTACT_TEXT });
     }
     sseSend(res, { done: true });
