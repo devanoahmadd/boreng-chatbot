@@ -7,38 +7,126 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="app-header">
-      <h1>Boreng</h1>
-      <p class="moto">"Gue lahir dari cinta yang pergi. Gue di sini untuk lo yang tertinggal."</p>
-      <button id="help-btn" class="help-btn" type="button">Butuh bantuan sekarang?</button>
-    </header>
+  <!-- Lapisan bintang ambient (murni dekoratif) -->
+  <div class="stars" aria-hidden="true"></div>
 
-    <section id="help-panel" class="help-panel" hidden>
-      <p>Kalau lo lagi ngerasa pengen nyerah, lo nggak sendirian. Hubungi:</p>
-      <ul>
-        <li><strong>SEJIWA — Kemenkes:</strong> 119 ext 8 (24 jam)</li>
-        <li><strong>Into The Light Indonesia:</strong>
-          <a href="https://www.intothelightid.org/" target="_blank" rel="noopener">intothelightid.org</a>
-        </li>
-      </ul>
+  <div class="app">
+    <!-- ============ LAYAR WELCOME ============ -->
+    <section id="welcome" class="screen welcome" aria-label="Sambutan Boreng">
+      <div class="welcome-inner">
+        <!-- Maskot Kucing Boreng "Si Bintang" (Bulu Senja) -->
+        <svg class="mascot" viewBox="-12 -16 144 162" width="120" height="135" role="img" aria-label="Boreng, kucing hitam kecil">
+          <defs>
+            <linearGradient id="furFull" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4d4048"/><stop offset="1" stop-color="#2e252b"/>
+            </linearGradient>
+            <filter id="rimFull" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="1.6" flood-color="#efe0e2" flood-opacity="0.55"/>
+            </filter>
+          </defs>
+          <g filter="url(#rimFull)">
+            <path d="M86 104 q30 2 20 -24 q-2 13 -18 12 z" fill="#352b32"/>
+            <path d="M32 86 q-7 38 28 38 q35 0 28 -38 z" fill="url(#furFull)"/>
+            <circle cx="60" cy="50" r="33" fill="url(#furFull)"/>
+            <path d="M38 30 L31 6 L57 24 Z" fill="#3d323a"/>
+            <path d="M82 30 L89 6 L63 24 Z" fill="#3d323a"/>
+          </g>
+          <path d="M40 27 L35 13 L52 23 Z" fill="#d98a93" opacity=".6"/>
+          <path d="M80 27 L85 13 L68 23 Z" fill="#d98a93" opacity=".6"/>
+          <path d="M60 96 c-4 -7 -14 -3 -10 5 c2 4 10 9 10 9 c0 0 8 -5 10 -9 c4 -8 -6 -12 -10 -5 z" fill="none" stroke="#e59aa3" stroke-width="1.6" stroke-dasharray="2.5 2.5" stroke-linejoin="round"/>
+          <ellipse cx="40" cy="58" rx="6" ry="3.6" fill="#d98a93" opacity=".55"/>
+          <ellipse cx="80" cy="58" rx="6" ry="3.6" fill="#d98a93" opacity=".55"/>
+          <circle cx="48" cy="49" r="5.6" fill="#f4ecee"/><circle cx="72" cy="49" r="5.6" fill="#f4ecee"/>
+          <circle cx="49.8" cy="47.2" r="2" fill="#c4707b"/><circle cx="73.8" cy="47.2" r="2" fill="#c4707b"/>
+          <circle cx="46.5" cy="51" r="1" fill="#fff" opacity=".9"/><circle cx="70.5" cy="51" r="1" fill="#fff" opacity=".9"/>
+          <path d="M56 56 l8 0 -4 4 z" fill="#e59aa3"/>
+          <path d="M60 60 q-4 4 -8 2 M60 60 q4 4 8 2" fill="none" stroke="#c3b1b7" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M33 51 l-16 -3 M33 57 l-16 3 M87 51 l16 -3 M87 57 l16 3" stroke="#9a8d93" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M97 20 l2.4 5.4 5.4 2.4 -5.4 2.4 -2.4 5.4 -2.4 -5.4 -5.4 -2.4 5.4 -2.4 z" fill="#f0e8ea"/>
+        </svg>
+
+        <h1 class="welcome-title">Hai, gue Boreng.</h1>
+        <p class="welcome-moto">teman yang nggak pergi 🤍</p>
+        <p class="welcome-prompt">Lagi ngerasa apa malam ini?</p>
+
+        <div class="mood-list" id="mood-list">
+          <button class="mood-chip" type="button" data-mood="Sedih">Sedih</button>
+          <button class="mood-chip" type="button" data-mood="Hampa">Hampa</button>
+          <button class="mood-chip" type="button" data-mood="Capek">Capek</button>
+          <button class="mood-chip" type="button" data-mood="Cemas">Cemas</button>
+          <button class="mood-chip" type="button" data-mood="Marah">Marah</button>
+          <button class="mood-chip" type="button" data-mood="Bingung">Bingung</button>
+        </div>
+
+        <button class="welcome-skip" id="welcome-skip" type="button">atau langsung cerita aja →</button>
+      </div>
     </section>
 
-    <main id="chat-box" class="chat-box" aria-live="polite"></main>
+    <!-- ============ LAYAR CHAT ============ -->
+    <section id="chat" class="screen chat" aria-label="Obrolan dengan Boreng" hidden>
+      <header class="chat-header">
+        <div class="brand">
+          <div class="avatar avatar-sm" aria-hidden="true">
+            <svg viewBox="22 16 76 54" width="26" height="18">
+              <path d="M40 30 L33 12 L55 26 Z" fill="#463a42"/><path d="M80 30 L87 12 L65 26 Z" fill="#463a42"/>
+              <path d="M40 27 L36 16 L50 24 Z" fill="#d98a93" opacity=".6"/><path d="M80 27 L84 16 L70 24 Z" fill="#d98a93" opacity=".6"/>
+              <circle cx="48" cy="46" r="5" fill="#f4ecee"/><circle cx="72" cy="46" r="5" fill="#f4ecee"/>
+              <circle cx="49.4" cy="44.4" r="1.7" fill="#c4707b"/><circle cx="73.4" cy="44.4" r="1.7" fill="#c4707b"/>
+              <path d="M56 53 l8 0 -4 4 z" fill="#e59aa3"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">Boreng</span>
+            <span class="brand-moto">teman yang nggak pergi</span>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="calm-btn" class="ctrl" type="button" aria-label="Mode Tenang" aria-pressed="false" title="Mode Tenang">☾</button>
+          <button id="breath-btn" class="ctrl" type="button" aria-label="Latihan napas" title="Latihan napas">⌇</button>
+          <button id="help-btn" class="ctrl ctrl-help" type="button" aria-label="Kontak bantuan darurat" aria-expanded="false">♡ bantuan</button>
+        </div>
+      </header>
 
-    <form id="chat-form" class="chat-form">
-      <input id="user-input" type="text" placeholder="Cerita aja, Boreng dengerin..."
-             autocomplete="off" required />
-      <button id="send-btn" type="submit">Kirim</button>
-    </form>
+      <section id="help-panel" class="help-panel" hidden>
+        <p>Kalau lo lagi ngerasa pengen nyerah, lo nggak sendirian. Hubungi:</p>
+        <ul>
+          <li><strong>SEJIWA — Kemenkes:</strong> 119 ext 8 (24 jam)</li>
+          <li><strong>Into The Light Indonesia:</strong>
+            <a href="https://www.intothelightid.org/" target="_blank" rel="noopener">intothelightid.org</a>
+          </li>
+        </ul>
+      </section>
 
-    <footer class="disclaimer">
-      Boreng nemenin, bukan pengganti tenaga profesional.
-    </footer>
+      <main id="chat-box" class="chat-box" aria-live="polite"></main>
+
+      <div id="starters" class="starters">
+        <button class="starter-chip" type="button">Aku lagi kesepian</button>
+        <button class="starter-chip" type="button">Cuma pengen cerita</button>
+        <button class="starter-chip" type="button">Aku capek banget</button>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <input id="user-input" type="text" placeholder="Cerita aja, Boreng dengerin..."
+               autocomplete="off" required />
+        <button id="send-btn" type="submit" aria-label="Kirim">↑</button>
+      </form>
+
+      <footer class="disclaimer">
+        Boreng nemenin, bukan pengganti tenaga profesional.
+      </footer>
+    </section>
   </div>
 
-  <!-- Render markdown aman. Versi terpin + SRI (Subresource Integrity) untuk
-       mencegah risiko kalau CDN dikompromikan. -->
+  <!-- ============ OVERLAY LATIHAN NAPAS ============ -->
+  <div id="breathing" class="breathing-overlay" hidden>
+    <div class="breathing-card">
+      <div class="breath-circle"><span id="breath-text">Tarik napas…</span></div>
+      <p class="breath-hint">Ikuti lingkarannya pelan-pelan.</p>
+      <button id="breath-close" class="breath-close" type="button">Selesai</button>
+    </div>
+  </div>
+
+  <!-- Render markdown aman. Versi terpin + SRI — JANGAN ubah hash. -->
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"
           integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi"
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
