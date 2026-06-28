@@ -168,3 +168,46 @@ body{
 @media (prefers-reduced-motion: reduce){
   .mood-chip,.starter-chip{ transition:none; }
 }
+
+/* ===== Panel darurat (AMBER, bukan rose) ===== */
+.help-panel{
+  background:var(--surface); border:1px solid var(--lifeline); border-radius:12px;
+  padding:12px 16px; margin:10px 0; font-size:.9rem; color:var(--text-soft);
+}
+.help-panel[hidden]{ display:none; }
+.help-panel ul{ margin:8px 0 0; padding-left:18px; }
+.help-panel strong{ color:var(--text); }
+.help-panel a{ color:var(--lifeline); }
+
+/* ===== Overlay latihan napas ===== */
+.breathing-overlay{
+  position:fixed; inset:0; z-index:10; background:rgba(16,12,13,.86);
+  display:flex; align-items:center; justify-content:center;
+  animation:fadeIn .3s ease both;
+}
+.breathing-overlay[hidden]{ display:none; }
+.breathing-card{ text-align:center; padding:24px; }
+.breath-circle{
+  width:170px; height:170px; margin:0 auto 18px; border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, rgba(217,138,147,.35), rgba(217,138,147,.08));
+  border:2px solid var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text); font-size:1rem;
+  animation:breathe 14s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{ transform:scale(.8); }     /* buang */
+  28%{ transform:scale(1.15); }       /* puncak tarik */
+  57%{ transform:scale(1.15); }       /* tahan */
+}
+.breath-hint{ color:var(--muted); font-size:.85rem; margin:0 0 18px; }
+.breath-close{
+  background:var(--surface); border:1px solid var(--border-soft); color:var(--text-soft);
+  border-radius:999px; padding:9px 22px; font-size:.9rem; cursor:pointer;
+}
+.breath-close:hover{ color:var(--text); }
+
+@media (prefers-reduced-motion: reduce){
+  .breathing-overlay{ animation:none; }
+  .breath-circle{ animation:none; }
+}

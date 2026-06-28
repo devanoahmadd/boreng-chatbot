@@ -160,3 +160,36 @@ starters.addEventListener('click', (e) => {
   if (!chip) return;
   sendMessage(chip.textContent);
 });
+
+// ===== Panel kontak darurat =====
+const helpBtn = document.getElementById('help-btn');
+const helpPanel = document.getElementById('help-panel');
+helpBtn.addEventListener('click', () => {
+  const show = helpPanel.hidden;
+  helpPanel.hidden = !show;
+  helpBtn.setAttribute('aria-expanded', String(show));
+});
+
+// ===== Latihan napas =====
+const breathing = document.getElementById('breathing');
+const breathText = document.getElementById('breath-text');
+const breathBtn = document.getElementById('breath-btn');
+const breathClose = document.getElementById('breath-close');
+const BREATH_STEPS = ['Tarik napas…','Tahan…','Buang…','Tahan…'];
+let breathTimer = null;
+
+function openBreathing(){
+  breathing.hidden = false;
+  let i = 0;
+  breathText.textContent = BREATH_STEPS[0];
+  breathTimer = setInterval(() => {
+    i = (i + 1) % BREATH_STEPS.length;
+    breathText.textContent = BREATH_STEPS[i];
+  }, 3500);
+}
+function closeBreathing(){
+  breathing.hidden = true;
+  if (breathTimer){ clearInterval(breathTimer); breathTimer = null; }
+}
+breathBtn.addEventListener('click', openBreathing);
+breathClose.addEventListener('click', closeBreathing);
