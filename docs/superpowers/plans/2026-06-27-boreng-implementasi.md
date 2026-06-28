@@ -470,7 +470,7 @@ function isTransient(err) {
 // Stream balasan Boreng. onChunk dipanggil tiap potongan teks.
 // Mengembalikan history terbaru untuk disimpan ke session.
 export async function streamReply({ history, message, onChunk }) {
-  let lastErr;
+  let lastErr = new Error('streamReply: tidak ada attempt yang berjalan (cek GEMINI_MAX_RETRY)');
 
   for (let attempt = 0; attempt <= GEMINI_MAX_RETRY; attempt++) {
     let emitted = false;
@@ -481,19 +481,22 @@ export async function streamReply({ history, message, onChunk }) {
         history,
       });
 
-      const stream = await withTimeout(
-        chat.sendMessageStream({ message }),
+      // Timeout membungkus SELURUH proses streaming (ambil stream + iterasi),
+      // supaya hang di tengah stream tetap ter-timeout, bukan hanya saat inisiasi.
+      await withTimeout(
+        (async () => {
+          const stream = await chat.sendMessageStream({ message });
+          for await (const chunk of stream) {
+            const piece = chunk.text;
+            if (piece) {
+              emitted = true;
+              onChunk(piece);
+            }
+          }
+        })(),
         GEMINI_TIMEOUT_MS,
-        'sendMessageStream',
+        'stream-gemini',
       );
-
-      for await (const chunk of stream) {
-        const piece = chunk.text;
-        if (piece) {
-          emitted = true;
-          onChunk(piece);
-        }
-      }
 
       return chat.getHistory();
     } catch (err) {
@@ -590,8 +593,10 @@ function sseHeaders() {
   };
 }
 
-// Kirim satu event SSE.
+// Kirim satu event SSE. Guard: jangan menulis setelah response ditutup
+// (mis. chunk telat dari stream yang sudah timeout) agar server tidak crash.
 function sseSend(res, obj) {
+  if (res.writableEnded) return;
   res.write(`data: ${JSON.stringify(obj)}\n\n`);
 }
 
@@ -628,6 +633,10 @@ router.post('/chat', chatLimiter, async (req, res) => {
 
   res.writeHead(200, sseHeaders());
 
+  // Hitung sinyal krisis di awal: jaminan kontak darurat HARUS independen
+  // dari sukses/gagalnya Gemini (Bagian 4/5/13 CLAUDE.md).
+  const isCrisis = checkCrisis(message);
+
   try {
     const history = getHistory(sessionId);
 
@@ -638,17 +647,15 @@ router.post('/chat', chatLimiter, async (req, res) => {
     });
 
     saveHistory(sessionId, updatedHistory);
-
-    // Jaring pengaman: kontak darurat dijamin muncul, independen dari output model.
-    if (checkCrisis(message)) {
-      sseSend(res, { text: CRISIS_CONTACT_TEXT });
-    }
-
-    sseSend(res, { done: true });
   } catch (err) {
     console.error('Gagal stream Gemini:', err);
     sseSend(res, { error: 'Maaf, Boreng lagi susah mikir bentar. Coba kirim lagi ya 💙' });
   } finally {
+    // Jaring pengaman: kontak darurat DIJAMIN muncul walau Gemini gagal.
+    if (isCrisis) {
+      sseSend(res, { text: CRISIS_CONTACT_TEXT });
+    }
+    sseSend(res, { done: true });
     res.end();
   }
 });
@@ -1089,6 +1096,8 @@ form.addEventListener('submit', async (e) => {
       body: JSON.stringify({ sessionId: SESSION_ID, message: text }),
     });
 
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let sseBuf = '';
@@ -1133,6 +1142,7 @@ form.addEventListener('submit', async (e) => {
       bubble.textContent = 'Hmm, Boreng nggak sempat jawab. Coba lagi ya 💙';
     }
   } catch (err) {
+    console.error('[Boreng]', err);
     bubble.textContent = 'Yah, koneksinya putus. Coba lagi ya 💙';
   } finally {
     setStreaming(false);
