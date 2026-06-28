@@ -179,6 +179,7 @@ const BREATH_STEPS = ['Tarik napas…','Tahan…','Buang…','Tahan…'];
 let breathTimer = null;
 
 function openBreathing(){
+  if (breathTimer){ clearInterval(breathTimer); breathTimer = null; } // cegah timer dobel
   breathing.hidden = false;
   let i = 0;
   breathText.textContent = BREATH_STEPS[0];
@@ -186,13 +187,20 @@ function openBreathing(){
     i = (i + 1) % BREATH_STEPS.length;
     breathText.textContent = BREATH_STEPS[i];
   }, 3500);
+  breathClose.focus(); // a11y: pindahkan fokus ke dalam dialog
 }
 function closeBreathing(){
   breathing.hidden = true;
   if (breathTimer){ clearInterval(breathTimer); breathTimer = null; }
+  breathBtn.focus(); // a11y: kembalikan fokus ke tombol pemicu
 }
 breathBtn.addEventListener('click', openBreathing);
 breathClose.addEventListener('click', closeBreathing);
+
+// Tutup overlay napas dengan tombol Escape (a11y keyboard).
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !breathing.hidden) closeBreathing();
+});
 
 // ===== Mode Tenang =====
 const calmBtn = document.getElementById('calm-btn');
