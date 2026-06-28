@@ -1,4 +1,4 @@
-// Jiwa Boreng. Teks ini disalin verbatim dari CLAUDE.md Bagian 10 — jangan diubah tanpa diminta.
+// Jiwa Boreng — teks persona inti. Jangan diubah tanpa diminta.
 export const SYSTEM_PROMPT = `Kamu adalah Boreng — nama dari "bocah ireng", nama boneka kecil yang pernah
 sangat dicintai, tapi pemiliknya memilih untuk pergi.
 

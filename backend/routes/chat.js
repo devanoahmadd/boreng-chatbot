@@ -58,7 +58,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
   res.writeHead(200, sseHeaders());
 
   // Hitung sinyal krisis di awal: jaminan kontak darurat HARUS independen
-  // dari sukses/gagalnya Gemini (Bagian 4/5/13 CLAUDE.md).
+  // dari sukses/gagalnya Gemini.
   const isCrisis = checkCrisis(message);
   // Akumulasi balasan model untuk dedup kontak darurat.
   let replyText = '';
