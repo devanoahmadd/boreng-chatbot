@@ -211,3 +211,19 @@ body{
   .breathing-overlay{ animation:none; }
   .breath-circle{ animation:none; }
 }
+
+/* ===== Mode Tenang: redupkan + matikan gerak ===== */
+body.calm .stars{ display:none; }
+body.calm .breath-circle{ animation:none; }
+body.calm .typing span{ animation:none; }
+body.calm{ filter:brightness(.9) saturate(.85); }
+.ctrl[aria-pressed="true"]{ color:var(--accent); border-color:var(--accent); }
+
+/* ===== Responsive mobile ===== */
+@media (max-width:480px){
+  .chat{ padding:10px; }
+  .msg{ max-width:88%; }
+  .welcome-title{ font-size:1.45rem; }
+  .controls{ gap:4px; }
+  .ctrl-help{ padding:0 9px; font-size:.72rem; }
+}

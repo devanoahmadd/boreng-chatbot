@@ -193,3 +193,13 @@ function closeBreathing(){
 }
 breathBtn.addEventListener('click', openBreathing);
 breathClose.addEventListener('click', closeBreathing);
+
+// ===== Mode Tenang =====
+const calmBtn = document.getElementById('calm-btn');
+function setCalm(on){
+  document.body.classList.toggle('calm', on);
+  calmBtn.setAttribute('aria-pressed', String(on));
+  try{ localStorage.setItem('boreng-calm', on ? '1' : '0'); } catch{}
+}
+calmBtn.addEventListener('click', () => setCalm(!document.body.classList.contains('calm')));
+try{ if (localStorage.getItem('boreng-calm') === '1') setCalm(true); } catch{}
